@@ -1,31 +1,11 @@
-import socket
+import asyncio
+import websockets
 
-# create a socket object
-serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+async def handler(websocket, path):
+    async for message in websocket:
+        await websocket.send(message[::-1])
 
-# get local machine name
-host = socket.gethostname()                           
+start_server = websockets.serve(handler, "0.0.0.0", 10000)
 
-port = 10000
-
-# bind to the port
-serversocket.bind((host, port))                                  
-
-# queue up to 5 requests
-serversocket.listen(5)                                           
-
-print("Server listening on port", port)
-
-while True:
-    # establish a connection
-    clientsocket,addr = serversocket.accept()      
-
-    print("Got a connection from", addr)
-    data = clientsocket.recv(1024).decode("utf-8")
-    print("Received data: ", data)
-
-    # send a HTTP response to the client
-    http_response = "HTTP/1.1 200 OK\n\nHello from the server!"
-    clientsocket.sendall(http_response.encode("utf-8"))
-
-    clientsocket.close()
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
