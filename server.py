@@ -1,15 +1,30 @@
 import socket
 
-HOST = '0.0.0.0'
-PORT = 10000
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('0.0.0.0', 10000))
+s.listen()
+print("Socket listening on port 10000")
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    while True:
-        conn, addr = s.accept()
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.sendall(data[::-1])
+while True:
+    client, addr = s.accept()
+    print("Accepted connection from", addr)
+
+    def receive_message():
+        data = client.recv(1024).decode()
+        if not data:
+            return None
+        print("Received message:", data)
+        return data
+
+    def send_message(message):
+        client.send(message.encode())
+        print("Sent message:", message)
+
+    message = receive_message()
+    send_message("Connected")
+
+    while message:
+        message = receive_message()
+
+    client.close()
+    print("Connection closed")
