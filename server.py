@@ -1,10 +1,21 @@
-from flask import Flask, request
+import socket
+import ssl
 
-app = Flask(__name__)
+HOST = '0.0.0.0'
+PORT = 12345
 
-@app.route('/.well-known/acme-challenge/<token>')
-def acme_challenge(token):
-    return "QDGx_vbCWQp18g05Zt03qivnjxsZyEGepPU-z8Ko8fs.T8FB3aRhNtUW0M9QjmY_biiW_CMX-X3uk3K9BvaRIU0"
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain(certfile='ssl/cert.pem', keyfile='ssl/key.pem')
 
-if __name__ == '__main__':
-    app.run(port=10000)
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    s.bind((HOST, PORT))
+    s.listen()
+    while True:
+        conn, addr = s.accept()
+        print('Connected by', addr)
+        with context.wrap_socket(conn, server_side=True) as ssock:
+            while True:
+                data = ssock.recv(1024)
+                if not data:
+                    break
+                ssock.sendall(data[::-1])
