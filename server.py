@@ -3,7 +3,8 @@ import websockets
 
 async def handler(websocket, path):
     async for message in websocket:
-        await websocket.send(message[::-1])
+        data = message[::-1]
+        await websocket.send(data)
 
 start_server = websockets.serve(handler, "0.0.0.0", 10000)
 
