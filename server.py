@@ -1,15 +1,10 @@
-import socket
+from flask import Flask, request
 
-HOST = '0.0.0.0'
-PORT = 10000
+app = Flask(__name__)
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-    while True:
-        conn, addr = s.accept()
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.sendall(data[::-1])
+@app.route('/.well-known/acme-challenge/<token>')
+def acme_challenge(token):
+    return "QDGx_vbCWQp18g05Zt03qivnjxsZyEGepPU-z8Ko8fs.T8FB3aRhNtUW0M9QjmY_biiW_CMX-X3uk3K9BvaRIU0"
+
+if __name__ == '__main__':
+    app.run(port=10000)
