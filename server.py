@@ -1,30 +1,31 @@
 import socket
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('0.0.0.0', 10000))
-s.listen()
-print("Socket listening on port 10000")
+# create a socket object
+serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
+
+# get local machine name
+host = socket.gethostname()                           
+
+port = 10000
+
+# bind to the port
+serversocket.bind((host, port))                                  
+
+# queue up to 5 requests
+serversocket.listen(5)                                           
+
+print("Server listening on port", port)
 
 while True:
-    client, addr = s.accept()
-    print("Accepted connection from", addr)
+    # establish a connection
+    clientsocket,addr = serversocket.accept()      
 
-    def receive_message():
-        data = client.recv(1024).decode()
-        if not data:
-            return None
-        print("Received message:", data)
-        return data
+    print("Got a connection from", addr)
+    data = clientsocket.recv(1024).decode("utf-8")
+    print("Received data: ", data)
 
-    def send_message(message):
-        client.send(message.encode())
-        print("Sent message:", message)
+    # send a HTTP response to the client
+    http_response = "HTTP/1.1 200 OK\n\nHello from the server!"
+    clientsocket.sendall(http_response.encode("utf-8"))
 
-    message = receive_message()
-    send_message("Connected")
-
-    while message:
-        message = receive_message()
-
-    client.close()
-    print("Connection closed")
+    clientsocket.close()

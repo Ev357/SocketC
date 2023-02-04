@@ -1,27 +1,22 @@
 import socket
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(('0.0.0.0', 10000))
-print("Connected to server")
+# create a socket object
+clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 
-def send_message(message):
-    s.send(message.encode())
-    print("Sent message:", message)
+# specify the IP address of the server
+host = "localhost"                           
 
-def receive_message():
-    data = s.recv(1024).decode()
-    print("Received message:", data)
-    return data
+port = 10000
 
-send_message("Hello Server")
-response = receive_message()
+# connection to hostname on the port.
+clientsocket.connect((host, port))                               
 
-while True:
-    message = input("Enter message to send (type 'exit' to quit): ")
-    if message == "exit":
-        break
-    send_message(message)
-    response = receive_message()
+# send a HTTP request to the server
+http_request = "GET / HTTP/1.1\nHost: " + host + "\n\n"
+clientsocket.sendall(http_request.encode("utf-8"))
 
-s.close()
-print("Connection closed")
+# receive data from the server
+data = clientsocket.recv(1024).decode("utf-8")
+print("Received data: ", data)
+
+clientsocket.close()
