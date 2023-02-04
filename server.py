@@ -2,7 +2,7 @@ import socket
 import ssl
 
 HOST = '0.0.0.0'
-PORT = 12345
+PORT = 10000
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(certfile='ssl/cert.pem', keyfile='ssl/key.pem')
